@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-    "ecommerce-api/models"
+    "github.com/TobiAdeniji94/ecommerce_api/models"
 
     "gorm.io/driver/postgres"
     "gorm.io/gorm"

@@ -12,3 +12,9 @@ type User struct {
     Password string `json:"-"`
     Role     string `json:"role" gorm:"default:user"`
 }
+
+// LoginInput to bind the JSON body when a user logs in.
+type LoginInput struct {
+    Email    string `json:"email" binding:"required"`
+    Password string `json:"password" binding:"required"`
+}
