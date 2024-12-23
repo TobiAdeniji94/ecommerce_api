@@ -10,7 +10,7 @@ import (
     "github.com/TobiAdeniji94/ecommerce_api/utils"
 )
 
-// AuthMiddleware checks for a valid JWT token in the Authorization header.
+// Middleware checks for a valid JWT token in the Authorization header.
 func AuthMiddleware(c *gin.Context) {
     // Example "Authorization" header: "Bearer <token>"
     authHeader := c.GetHeader("Authorization")
@@ -20,7 +20,7 @@ func AuthMiddleware(c *gin.Context) {
         return
     }
 
-    // Strip out the "Bearer " part to get the token
+    // Remove "Bearer " to get the token
     tokenString := strings.TrimPrefix(authHeader, "Bearer ")
     if tokenString == "" {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization header format"})
@@ -42,25 +42,34 @@ func AuthMiddleware(c *gin.Context) {
     }
 
     // Extract custom claims from the token
-    if claims, ok := token.Claims.(jwt.MapClaims); ok {
-        // user_id was stored as float64, so we need to cast it to uint or int
-        if userID, ok := claims["user_id"].(float64); ok {
-            c.Set("userID", uint(userID))
+    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+        userIDStr, ok := claims["user_id"].(string)
+        if !ok {
+            c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID in token"})
+            c.Abort()
+            return
         }
-        if role, ok := claims["role"].(string); ok {
-            c.Set("role", role)
+
+        roleStr, ok := claims["role"].(string)
+        if !ok {
+            c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid role in token"})
+            c.Abort()
+            return
         }
+
+        c.Set("userID", userIDStr)
+        c.Set("role", roleStr)
     } else {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
         c.Abort()
         return
     }
 
-    // Token is valid, proceed
+    // if token is valid, proceed
     c.Next()
 }
 
-// AdminMiddleware ensures the user has the "admin" role.
+// Middleware to ensure the user has the "admin" role.
 func AdminMiddleware(c *gin.Context) {
     role, exists := c.Get("role")
     if !exists {
@@ -69,7 +78,7 @@ func AdminMiddleware(c *gin.Context) {
         return
     }
 
-    // The role is stored as an interface{}; cast it to string
+    // cast it to string if role is stored as an interface{}; 
     roleStr, ok := role.(string)
     if !ok || roleStr != "admin" {
         c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient privileges"})

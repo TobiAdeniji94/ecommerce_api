@@ -1,11 +1,11 @@
 package utils
 
 import (
-    "fmt"
-    "os"
-    "time"
+	"fmt"
+	"os"
+	"time"
 
-    "github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // jwtKey to be initialized in the init() function
@@ -21,8 +21,8 @@ func init() {
     fmt.Println("JWT_SECRET loaded successfully")
 }
 
-// GenerateJWT creates a new JWT token with the user ID, role, and a 24-hour expiration.
-func GenerateJWT(userID uint, role string) (string, error) {
+// GenerateJWT creates a new JWT token.
+func GenerateJWT(userID string, role string) (string, error) {
     // Create the token with claims
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "user_id": userID,

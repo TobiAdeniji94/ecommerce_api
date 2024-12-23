@@ -2,9 +2,9 @@ package controllers
 
 import (
     "net/http"
-    "strconv"
 
     "github.com/gin-gonic/gin"
+    "github.com/google/uuid"
     
     "github.com/TobiAdeniji94/ecommerce_api/config"
     "github.com/TobiAdeniji94/ecommerce_api/models"
@@ -40,7 +40,7 @@ func GetProducts(c *gin.Context) {
 // GetProductByID retrieves a single product by ID
 func GetProductByID(c *gin.Context) {
     idStr := c.Param("id")
-    id, err := strconv.Atoi(idStr)
+    id, err := uuid.Parse(idStr)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
         return
@@ -58,7 +58,7 @@ func GetProductByID(c *gin.Context) {
 // UpdateProduct modifies an existing product (admin only)
 func UpdateProduct(c *gin.Context) {
     idStr := c.Param("id")
-    id, err := strconv.Atoi(idStr)
+    id, err := uuid.Parse(idStr)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
         return
@@ -93,7 +93,7 @@ func UpdateProduct(c *gin.Context) {
 // DeleteProduct deletes a product by ID (admin only)
 func DeleteProduct(c *gin.Context) {
     idStr := c.Param("id")
-    id, err := strconv.Atoi(idStr)
+    id, err := uuid.Parse(idStr)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
         return

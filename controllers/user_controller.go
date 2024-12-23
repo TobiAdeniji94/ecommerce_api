@@ -5,7 +5,7 @@ import (
 
     "github.com/gin-gonic/gin"
     "golang.org/x/crypto/bcrypt"
-    
+
     "github.com/TobiAdeniji94/ecommerce_api/config"
     "github.com/TobiAdeniji94/ecommerce_api/models"
     "github.com/TobiAdeniji94/ecommerce_api/utils"
@@ -27,7 +27,7 @@ func RegisterUser(c *gin.Context) {
     }
     input.Password = hashedPassword
 
-    // Default role is user (or fetch from request if needed)
+    // Default role is user if not provided
     if input.Role == "" {
         input.Role = "user"
     }
@@ -38,7 +38,7 @@ func RegisterUser(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{"message": "User registered successfully!"})
+    c.JSON(http.StatusOK, gin.H{"message": "User registered successfully!", "user_id": input.ID})
 }
 
 // LoginUser handles user authentication
@@ -63,7 +63,7 @@ func LoginUser(c *gin.Context) {
     }
 
     // Generate JWT token
-    token, err := utils.GenerateJWT(user.ID, user.Role)
+    token, err := utils.GenerateJWT(user.ID.String(), user.Role)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
         return
@@ -72,6 +72,7 @@ func LoginUser(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{
         "token":   token,
         "message": "Login successful",
+        "user_id": user.ID,
     })
 }
 
