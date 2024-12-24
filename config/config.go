@@ -22,7 +22,7 @@ func ConnectDatabase() {
     port := os.Getenv("DB_PORT")
 
 	// data source name
-    dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+    dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
 		host, user, password, dbName, port,
 	)
 
