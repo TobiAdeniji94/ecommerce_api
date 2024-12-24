@@ -24,25 +24,34 @@ import (
 // @Failure 500 {object} models.ErrorResponse "Failed to create product"
 // @Router /products [post]
 func CreateProduct(c *gin.Context) {
-	var product models.ProductInput
-	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, models.ValidationErrorResponse{
-			Errors: []models.ValidationError{
-				{Field: "payload", Message: err.Error()},
-			},
-		})
-		return
-	}
+    var input models.ProductInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, models.ValidationErrorResponse{
+            Errors: []models.ValidationError{
+                {Field: "payload", Message: err.Error()},
+            },
+        })
+        return
+    }
 
-	if err := config.DB.Create(&product).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: "Failed to create product"})
-		return
-	}
+    // Map the input to the Product model
+    product := models.Product{
+        Name:        input.Name,
+        Description: input.Description,
+        Price:       input.Price,
+        Stock:       input.Stock,
+    }
 
-	c.JSON(http.StatusOK, models.SuccessResponse{
-		Message: "Product created successfully",
-		Data:    product,
-	})
+    // Insert the Product model into the database
+    if err := config.DB.Create(&product).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: "Failed to create product"})
+        return
+    }
+
+    c.JSON(http.StatusOK, models.SuccessResponse{
+        Message: "Product created successfully",
+        Data:    product,
+    })
 }
 
 // GetProducts lists all products
