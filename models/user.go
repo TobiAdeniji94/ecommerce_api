@@ -1,17 +1,19 @@
 package models
 
 import (
+    "time"
+
     "github.com/google/uuid"
     "gorm.io/gorm"
 )
 
-// user model to represent user.
-// Role can be "user" or "admin".
+// User model represents a user in the system.
 type User struct {
-    ID       uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-    Email    string `gorm:"unique;not null" json:"email"`
-    Password string `json:"-"`
-    Role     string `json:"role" gorm:"default:user"`
+    ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
+    Email     string    `gorm:"unique;not null" json:"email"`
+    Password  string    `gorm:"type:varchar(255);not null" json:"password"`
+    Role      string    `json:"role" gorm:"default:user"`
+    CreatedAt time.Time `json:"created_at"`
 }
 
 // BeforeCreate hook to generate a UUID for the user
@@ -20,10 +22,4 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
         u.ID = uuid.New()
     }
     return
-}
-
-// LoginInput to bind the JSON body when a user logs in.
-type LoginInput struct {
-    Email    string `json:"email" binding:"required"`
-    Password string `json:"password" binding:"required"`
 }

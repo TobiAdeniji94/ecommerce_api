@@ -2,40 +2,43 @@ package routes
 
 import (
     "github.com/gin-gonic/gin"
-    
+
     "github.com/TobiAdeniji94/ecommerce_api/controllers"
     "github.com/TobiAdeniji94/ecommerce_api/middleware"
 )
 
 func InitializeRoutes(r *gin.Engine) {
-
-    // Public routes: user registration/login
-    userGroup := r.Group("/users")
+    // API Versioning
+    api := r.Group("/api/v1")
     {
-        userGroup.POST("/register", controllers.RegisterUser)
-        userGroup.POST("/login", controllers.LoginUser)
-    }
+        // Public Routes: User registration and login
+        userGroup := api.Group("/users")
+        {
+            userGroup.POST("/register", controllers.RegisterUser)
+            userGroup.POST("/login", controllers.LoginUser)
+        }
 
-    // Authenticated routes
-    protected := r.Group("/")
-    protected.Use(middleware.AuthMiddleware) // Checks JWT
+        // Protected Routes: Requires Authentication
+        protected := api.Group("/")
+        protected.Use(middleware.AuthMiddleware) // JWT authentication middleware
 
-    // Product routes (admin only for create/update/delete)
-    productGroup := protected.Group("/products")
-    {
-        productGroup.POST("", middleware.AdminMiddleware, controllers.CreateProduct)
-        productGroup.GET("", controllers.GetProducts)
-        productGroup.GET("/:id", controllers.GetProductByID)
-        productGroup.PUT("/:id", middleware.AdminMiddleware, controllers.UpdateProduct)
-        productGroup.DELETE("/:id", middleware.AdminMiddleware, controllers.DeleteProduct)
-    }
+        // Product Routes: Admin-only for create, update, delete
+        productGroup := protected.Group("/products")
+        {
+            productGroup.POST("", middleware.AdminMiddleware, controllers.CreateProduct)  // Create a product
+            productGroup.GET("", controllers.GetProducts)                                // List all products
+            productGroup.GET("/:id", controllers.GetProductByID)                         // Get product by ID
+            productGroup.PUT("/:id", middleware.AdminMiddleware, controllers.UpdateProduct) // Update a product
+            productGroup.DELETE("/:id", middleware.AdminMiddleware, controllers.DeleteProduct) // Delete a product
+        }
 
-    // Order routes
-    orderGroup := protected.Group("/orders")
-    {
-        orderGroup.POST("", controllers.PlaceOrder)
-        orderGroup.GET("", controllers.GetUserOrders)
-        orderGroup.PUT("/:id/cancel", controllers.CancelOrder)
-        orderGroup.PUT("/:id/status", middleware.AdminMiddleware, controllers.UpdateOrderStatus)
+        // Order Routes: Authenticated users and admin access
+        orderGroup := protected.Group("/orders")
+        {
+            orderGroup.POST("", controllers.PlaceOrder)                          // Place a new order
+            orderGroup.GET("", controllers.GetUserOrders)                        // List user orders
+            orderGroup.PUT("/:id/cancel", controllers.CancelOrder)               // Cancel an order
+            orderGroup.PUT("/:id/status", middleware.AdminMiddleware, controllers.UpdateOrderStatus) // Update order status (Admin)
+        }
     }
 }
