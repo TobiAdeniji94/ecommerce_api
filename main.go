@@ -44,7 +44,7 @@ func main() {
 
     // CORS middleware
     r.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"http://localhost:3000", "ecommerce-api-vkui.onrender.com"}, 
+        AllowOrigins:     []string{"http://localhost:3000", "https://ecommerce-api-vkui.onrender.com"}, 
         AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},                   
         AllowHeaders:     []string{"Authorization", "Content-Type"},                 
         ExposeHeaders:    []string{"Content-Length"},                                
