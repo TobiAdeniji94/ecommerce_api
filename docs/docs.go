@@ -280,7 +280,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Product"
+                            "$ref": "#/definitions/models.ProductInput"
                         }
                     }
                 ],
@@ -379,7 +379,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Product"
+                            "$ref": "#/definitions/models.ProductInput"
                         }
                     }
                 ],
@@ -530,7 +530,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.UserInput"
                         }
                     }
                 ],
@@ -583,22 +583,27 @@ const docTemplate = `{
         },
         "models.OrderItemInput": {
             "type": "object",
+            "required": [
+                "product_id",
+                "quantity"
+            ],
             "properties": {
-                "product_id binding:": {
-                    "description": "Product ID",
+                "product_id": {
                     "type": "string"
                 },
-                "quantity binding:": {
-                    "description": "Quantity",
-                    "type": "integer"
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },
         "models.PlaceOrderInput": {
             "type": "object",
+            "required": [
+                "items"
+            ],
             "properties": {
                 "items": {
-                    "description": "List of order items",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.OrderItemInput"
@@ -606,13 +611,15 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Product": {
+        "models.ProductInput": {
             "type": "object",
+            "required": [
+                "name",
+                "price",
+                "stock"
+            ],
             "properties": {
                 "description": {
-                    "type": "string"
-                },
-                "id": {
                     "type": "string"
                 },
                 "name": {
@@ -622,7 +629,8 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "stock": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },
@@ -637,20 +645,23 @@ const docTemplate = `{
         },
         "models.UpdateOrderStatusInput": {
             "type": "object",
+            "required": [
+                "status"
+            ],
             "properties": {
                 "status": {
-                    "description": "order status",
                     "type": "string"
                 }
             }
         },
-        "models.User": {
+        "models.UserInput": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
-                    "type": "string"
-                },
-                "id": {
                     "type": "string"
                 },
                 "password": {

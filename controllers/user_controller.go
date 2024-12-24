@@ -19,13 +19,13 @@ import (
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body models.User true "User registration payload"
+// @Param user body models.UserInput true "User registration payload"
 // @Success 200 {object} models.SuccessResponse "User registered successfully"
 // @Failure 400 {object} models.ValidationErrorResponse "Validation errors"
 // @Failure 500 {object} models.ErrorResponse "Failed to create user"
 // @Router /users/register [post]
 func RegisterUser(c *gin.Context) {
-	var input models.User
+	var input models.UserInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, models.ValidationErrorResponse{
@@ -66,15 +66,21 @@ func RegisterUser(c *gin.Context) {
 		})
 		return
 	}
-	input.Password = hashedPassword
+
+	// Map UserInput to User model
+	user := models.User{
+		Email:    input.Email,
+		Password: hashedPassword,
+		Role:     input.Role,
+	}
 
 	// Default role is user if not provided
-	if input.Role == "" {
-		input.Role = "user"
+	if user.Role == "" {
+		user.Role = "user"
 	}
 
 	// Create the user in DB
-	if err := config.DB.Create(&input).Error; err != nil {
+	if err := config.DB.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Message: "Failed to create user",
 		})
@@ -83,7 +89,7 @@ func RegisterUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, models.SuccessResponse{
 		Message: "User registered successfully",
-		Data:    gin.H{"user_id": input.ID},
+		Data:    gin.H{"user_id": user.ID},
 	})
 }
 

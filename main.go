@@ -8,6 +8,7 @@ import (
     "os/signal"
     "time"
 
+    "github.com/gin-contrib/cors"
     "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
     "github.com/swaggo/files"
@@ -16,6 +17,7 @@ import (
 
     "github.com/TobiAdeniji94/ecommerce_api/config"
     "github.com/TobiAdeniji94/ecommerce_api/routes"
+    "github.com/TobiAdeniji94/ecommerce_api/utils"
 )
 
 // @title E-Commerce API
@@ -34,11 +36,24 @@ func main() {
         log.Println("No .env file found or it failed to load. Continuing with system environment variables.")
     }
 
-    // Connect to the database
+    // Connect to database
     config.ConnectDatabase()
 
-    // Set up Gin router
+    // Gin router
     r := gin.Default()
+
+    // CORS middleware
+    r.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"http://localhost:3000", "https://yourdomain.com"}, 
+        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},                   
+        AllowHeaders:     []string{"Authorization", "Content-Type"},                 
+        ExposeHeaders:    []string{"Content-Length"},                                
+        AllowCredentials: true,                                                     
+        MaxAge:           12 * time.Hour,                                           
+    }))
+
+    // Rate Limiting middleware
+    r.Use(utils.PerClientRateLimiter()) // Call the middleware from utils
 
     // Swagger docs
     r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -52,13 +67,13 @@ func main() {
         port = "3001" // Default port
     }
 
-    // Set up the HTTP server
+    // HTTP server
     srv := &http.Server{
         Addr:    ":" + port,
         Handler: r,
     }
 
-    // Start the server in a goroutine
+    // Start server
     go func() {
         log.Printf("Server is running on port %s", port)
         if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

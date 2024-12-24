@@ -17,14 +17,14 @@ import (
 // @Tags Products
 // @Accept json
 // @Produce json
-// @Param product body models.Product true "Product payload"
+// @Param product body models.ProductInput true "Product payload"
 // @Security BearerAuth
 // @Success 200 {object} models.SuccessResponse "Product created successfully"
 // @Failure 400 {object} models.ValidationErrorResponse "Invalid product payload"
 // @Failure 500 {object} models.ErrorResponse "Failed to create product"
 // @Router /products [post]
 func CreateProduct(c *gin.Context) {
-	var product models.Product
+	var product models.ProductInput
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, models.ValidationErrorResponse{
 			Errors: []models.ValidationError{
@@ -106,7 +106,7 @@ func GetProductByID(c *gin.Context) {
 // @Description Allows an admin user to update an existing product by ID
 // @Tags Products
 // @Param id path string true "Product ID"
-// @Param product body models.Product true "Updated product payload"
+// @Param product body models.ProductInput true "Updated product payload"
 // @Security BearerAuth
 // @Success 200 {object} models.SuccessResponse "Product updated successfully"
 // @Failure 400 {object} models.ValidationErrorResponse "Invalid product ID or payload"
@@ -127,7 +127,7 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	var updateInput models.Product
+	var updateInput models.ProductInput
 	if err := c.ShouldBindJSON(&updateInput); err != nil {
 		c.JSON(http.StatusBadRequest, models.ValidationErrorResponse{
 			Errors: []models.ValidationError{

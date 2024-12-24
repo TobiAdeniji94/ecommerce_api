@@ -17,33 +17,39 @@ definitions:
     type: object
   models.OrderItemInput:
     properties:
-      'product_id binding:':
-        description: Product ID
+      product_id:
         type: string
-      'quantity binding:':
-        description: Quantity
+      quantity:
+        minimum: 1
         type: integer
+    required:
+    - product_id
+    - quantity
     type: object
   models.PlaceOrderInput:
     properties:
       items:
-        description: List of order items
         items:
           $ref: '#/definitions/models.OrderItemInput'
         type: array
+    required:
+    - items
     type: object
-  models.Product:
+  models.ProductInput:
     properties:
       description:
-        type: string
-      id:
         type: string
       name:
         type: string
       price:
         type: number
       stock:
+        minimum: 0
         type: integer
+    required:
+    - name
+    - price
+    - stock
     type: object
   models.SuccessResponse:
     properties:
@@ -54,19 +60,21 @@ definitions:
   models.UpdateOrderStatusInput:
     properties:
       status:
-        description: order status
         type: string
+    required:
+    - status
     type: object
-  models.User:
+  models.UserInput:
     properties:
       email:
-        type: string
-      id:
         type: string
       password:
         type: string
       role:
         type: string
+    required:
+    - email
+    - password
     type: object
   models.ValidationError:
     properties:
@@ -254,7 +262,7 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/models.Product'
+          $ref: '#/definitions/models.ProductInput'
       produces:
       - application/json
       responses:
@@ -349,7 +357,7 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/models.Product'
+          $ref: '#/definitions/models.ProductInput'
       responses:
         "200":
           description: Product updated successfully
@@ -418,7 +426,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.UserInput'
       produces:
       - application/json
       responses:
