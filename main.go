@@ -23,7 +23,7 @@ import (
 // @title E-Commerce API
 // @version 1.0
 // @description E-commerce API for managing orders and products.
-// @host localhost:3000
+// @host ecommerce-api-vkui.onrender.com
 // @BasePath /api/v1
 
 // @securityDefinitions.apikey BearerAuth
@@ -44,7 +44,7 @@ func main() {
 
     // CORS middleware
     r.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"http://localhost:3000", "https://yourdomain.com"}, 
+        AllowOrigins:     []string{"http://localhost:3000", "ecommerce-api-vkui.onrender.com"}, 
         AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},                   
         AllowHeaders:     []string{"Authorization", "Content-Type"},                 
         ExposeHeaders:    []string{"Content-Length"},                                
