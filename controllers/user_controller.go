@@ -58,6 +58,15 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// Check if the user already exists
+	var existingUser models.User
+	if err := config.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Message: "A user with this email already exists",
+		})
+		return
+	}
+
 	// Hash the password before saving
 	hashedPassword, err := HashPassword(input.Password)
 	if err != nil {
