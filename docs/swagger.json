@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:3000",
+    "host": "ecommerce-api-vkui.onrender.com",
     "basePath": "/api/v1",
     "paths": {
         "/orders": {

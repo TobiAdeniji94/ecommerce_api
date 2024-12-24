@@ -90,7 +90,7 @@ definitions:
           $ref: '#/definitions/models.ValidationError'
         type: array
     type: object
-host: localhost:3000
+host: ecommerce-api-vkui.onrender.com
 info:
   contact: {}
   description: E-commerce API for managing orders and products.
