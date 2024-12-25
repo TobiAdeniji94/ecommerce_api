@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"net/http"
     "github.com/gin-gonic/gin"
 
     "github.com/TobiAdeniji94/ecommerce_api/controllers"
@@ -8,6 +9,14 @@ import (
 )
 
 func InitializeRoutes(r *gin.Engine) {
+
+	// Welcome message
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Welcome to the E-commerce API",
+		})
+	})
+
     // API Versioning
     api := r.Group("/api/v1")
     {
