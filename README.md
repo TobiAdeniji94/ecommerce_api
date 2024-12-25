@@ -85,64 +85,94 @@ The **E-Commerce API** is a backend service designed to manage orders, products,
 
 The Swagger UI is available at `/swagger` (e.g., [`https://ecommerce-api-vkui.onrender.com/swagger`](https://ecommerce-api-vkui.onrender.com/swagger/index.html)).
 
-### Example Endpoints:
-- **POST /api/v1/users/register**: Register a new user.
-- **POST /api/v1/users/login**: Authenticate a user and return a JWT token.
-- **POST /api/v1/products**: Create a new product (Admin-only).
-- **GET /api/v1/products**: Retrieve all products.
-- **POST /api/v1/orders**: Place a new order.
+## **User Management**
 
-### Endpoints
+### **Register a New User**
+- **Method**: `POST`
+- **Route**: `/api/v1/users/register`
+- **Description**: Register a new user with email and password.
+- **Access**: Public
 
-#### **POST /api/v1/users/register**
-**Description**: Register a new user.  
-**Request Body**:
+#### **Request Payload**:
 ```json
 {
   "email": "user@example.com",
-  "password": "strongpassword",
-  "role": "user"
+  "password": "securepassword"
 }
 ```
-**Response (200)**:
-```json
-{
-  "message": "User registered successfully",
-  "data": {
-    "user_id": "123e4567-e89b-12d3-a456-426614174000"
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "User registered successfully",
+    "data": {
+      "user_id": "uuid-1234-5678-91011"
+    }
   }
-}
-```
+  ```
+- **Validation Error (400)**:
+  ```json
+  {
+    "errors": [
+      {
+        "field": "email",
+        "message": "Email is required"
+      },
+      {
+        "field": "password",
+        "message": "Password is required"
+      }
+    ]
+  }
+  ```
 
 ---
 
-#### **POST /api/v1/users/login**
-**Description**: Authenticate a user and return a JWT token.  
-**Request Body**:
+### **Login**
+- **Method**: `POST`
+- **Route**: `/api/v1/users/login`
+- **Description**: Authenticate a user and issue a JWT for session management.
+- **Access**: Public
+
+#### **Request Payload**:
 ```json
 {
   "email": "user@example.com",
-  "password": "strongpassword"
+  "password": "securepassword"
 }
 ```
-**Response (200)**:
-```json
-{
-  "message": "Login successful",
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user_id": "123e4567-e89b-12d3-a456-426614174000"
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Login successful",
+    "data": {
+      "token": "jwt-token",
+      "user_id": "uuid-1234-5678-91011"
+    }
   }
-}
-```
+  ```
+- **Invalid Credentials (401)**:
+  ```json
+  {
+    "message": "Invalid email or password"
+  }
+  ```
 
 ---
 
-#### **POST /api/v1/products**
-**Description**: Create a new product (Admin-only).  
-**Headers**:
-- `Authorization`: Bearer <JWT_TOKEN>
-**Request Body**:
+## **Product Management** (Admin Privileges Required)
+
+### **Create a Product**
+- **Method**: `POST`
+- **Route**: `/api/v1/products`
+- **Description**: Create a new product.
+- **Access**: Admin only
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Request Payload**:
 ```json
 {
   "name": "Wireless Mouse",
@@ -151,80 +181,242 @@ The Swagger UI is available at `/swagger` (e.g., [`https://ecommerce-api-vkui.on
   "stock": 100
 }
 ```
-**Response (200)**:
-```json
-{
-  "message": "Product created successfully",
-  "data": {
-    "id": "123e4567-e89b-12d3-a456-426614174000",
-    "name": "Wireless Mouse",
-    "description": "Ergonomic wireless mouse with adjustable DPI",
-    "price": 19.99,
-    "stock": 100,
-    "created_at": "2024-12-24T22:34:55Z",
-    "updated_at": "2024-12-24T22:34:55Z"
-  }
-}
-```
 
----
-
-#### **GET /api/v1/products**
-**Description**: Retrieve all products.  
-**Headers**:
-- `Authorization`: Bearer <JWT_TOKEN>
-**Response (200)**:
-```json
-{
-  "message": "Product(s) retrieved successfully",
-  "data": [
-    {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product created successfully",
+    "data": {
+      "id": "uuid-1234-5678-91011",
       "name": "Wireless Mouse",
       "description": "Ergonomic wireless mouse with adjustable DPI",
       "price": 19.99,
       "stock": 100,
-      "created_at": "2024-12-24T22:34:55Z",
-      "updated_at": "2024-12-24T22:34:55Z"
+      "created_at": "2024-12-25T10:00:00Z"
     }
-  ]
-}
-```
+  }
+  ```
 
 ---
 
-#### **POST /api/v1/orders**
-**Description**: Place a new order.  
-**Headers**:
-- `Authorization`: Bearer <JWT_TOKEN>
-**Request Body**:
+### **List All Products**
+- **Method**: `GET`
+- **Route**: `/api/v1/products`
+- **Description**: Retrieve a list of all available products.
+- **Access**: Authenticated users
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Products retrieved successfully",
+    "data": [
+      {
+        "id": "uuid-1234-5678-91011",
+        "name": "Wireless Mouse",
+        "description": "Ergonomic wireless mouse with adjustable DPI",
+        "price": 19.99,
+        "stock": 100
+      }
+    ]
+  }
+  ```
+
+---
+
+### **Get a Product by ID**
+- **Method**: `GET`
+- **Route**: `/api/v1/products/{id}`
+- **Description**: Retrieve details of a specific product by its ID.
+- **Access**: Authenticated users
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product retrieved successfully",
+    "data": {
+      "id": "uuid-1234-5678-91011",
+      "name": "Wireless Mouse",
+      "description": "Ergonomic wireless mouse with adjustable DPI",
+      "price": 19.99,
+      "stock": 100
+    }
+  }
+  ```
+
+---
+
+### **Update a Product**
+- **Method**: `PUT`
+- **Route**: `/api/v1/products/{id}`
+- **Description**: Update details of an existing product by its ID.
+- **Access**: Admin only
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Request Payload**:
+```json
+{
+  "name": "Updated Wireless Mouse",
+  "description": "Updated ergonomic wireless mouse",
+  "price": 24.99,
+  "stock": 150
+}
+```
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product updated successfully",
+    "data": {
+      "id": "uuid-1234-5678-91011",
+      "name": "Updated Wireless Mouse",
+      "description": "Updated ergonomic wireless mouse",
+      "price": 24.99,
+      "stock": 150
+    }
+  }
+  ```
+
+---
+
+### **Delete a Product**
+- **Method**: `DELETE`
+- **Route**: `/api/v1/products/{id}`
+- **Description**: Delete a product by its ID.
+- **Access**: Admin only
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product deleted successfully"
+  }
+  ```
+
+---
+
+## **Order Management**
+
+### **Place an Order**
+- **Method**: `POST`
+- **Route**: `/api/v1/orders`
+- **Description**: Place an order for one or more products.
+- **Access**: Authenticated users
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Request Payload**:
 ```json
 {
   "items": [
     {
-      "product_id": "123e4567-e89b-12d3-a456-426614174000",
+      "product_id": "uuid-1234-5678-91011",
       "quantity": 2
     }
   ]
 }
 ```
-**Response (200)**:
-```json
-{
-  "message": "Order created successfully",
-  "data": {
-    "order_id": "123e4567-e89b-12d3-a456-426614174000",
-    "status": "Pending",
-    "items": [
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Order placed successfully",
+    "data": {
+      "order_id": "uuid-1234-5678-91011",
+      "status": "Pending",
+      "items": [
+        {
+          "product_id": "uuid-1234-5678-91011",
+          "quantity": 2
+        }
+      ]
+    }
+  }
+  ```
+
+---
+
+### **List All Orders for a User**
+- **Method**: `GET`
+- **Route**: `/api/v1/orders`
+- **Description**: List all orders placed by the authenticated user.
+- **Access**: Authenticated users
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Orders retrieved successfully",
+    "data": [
       {
-        "product_id": "123e4567-e89b-12d3-a456-426614174000",
-        "quantity": 2
+        "order_id": "uuid-1234-5678-91011",
+        "status": "Pending",
+        "items": [
+          {
+            "product_id": "uuid-1234-5678-91011",
+            "quantity": 2
+          }
+        ]
       }
     ]
   }
+  ```
+
+---
+
+### **Cancel an Order**
+- **Method**: `PUT`
+- **Route**: `/api/v1/orders/{id}/cancel`
+- **Description**: Cancel an order if it is still in the "Pending" status.
+- **Access**: Authenticated users
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Order canceled successfully",
+    "data": {
+      "order_id": "uuid-1234-5678-91011",
+      "status": "Canceled"
+    }
+  }
+  ```
+
+---
+
+### **Update Order Status**
+- **Method**: `PUT`
+- **Route**: `/api/v1/orders/{id}/status`
+- **Description**: Update the status of an order.
+- **Access**: Admin only
+- **Headers**: `Authorization`: Bearer <JWT_TOKEN>
+
+#### **Request Payload**:
+```json
+{
+  "status": "Shipped"
 }
 ```
 
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Order status updated successfully",
+    "data": {
+      "order_id": "uuid-1234-5678-91011",
+      "status": "Shipped"
+    }
+  }
+  ```
 ---
 
 ## Environment Variables
@@ -309,4 +501,343 @@ PORT=3000
 This project is licensed under the [MIT License](LICENSE).
 
 ---
+
+
+Here’s the updated API documentation with JSON payloads and responses included for the described functionalities.
+
+---
+
+## **User Management**
+
+### **Register a New User**
+- **Method**: `POST`
+- **Route**: `/api/v1/users/register`
+- **Description**: Register a new user with email and password.
+- **Access**: Public
+
+#### **Request Payload**:
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
 ```
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "User registered successfully",
+    "data": {
+      "user_id": "uuid-1234-5678-91011"
+    }
+  }
+  ```
+- **Validation Error (400)**:
+  ```json
+  {
+    "errors": [
+      {
+        "field": "email",
+        "message": "Email is required"
+      },
+      {
+        "field": "password",
+        "message": "Password is required"
+      }
+    ]
+  }
+  ```
+
+---
+
+### **Login**
+- **Method**: `POST`
+- **Route**: `/api/v1/users/login`
+- **Description**: Authenticate a user and issue a JWT for session management.
+- **Access**: Public
+
+#### **Request Payload**:
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Login successful",
+    "data": {
+      "token": "jwt-token",
+      "user_id": "uuid-1234-5678-91011"
+    }
+  }
+  ```
+- **Invalid Credentials (401)**:
+  ```json
+  {
+    "message": "Invalid email or password"
+  }
+  ```
+
+---
+
+## **Product Management** (Admin Privileges Required)
+
+### **Create a Product**
+- **Method**: `POST`
+- **Route**: `/api/v1/products`
+- **Description**: Create a new product.
+- **Access**: Admin only
+
+#### **Request Payload**:
+```json
+{
+  "name": "Wireless Mouse",
+  "description": "Ergonomic wireless mouse with adjustable DPI",
+  "price": 19.99,
+  "stock": 100
+}
+```
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product created successfully",
+    "data": {
+      "id": "uuid-1234-5678-91011",
+      "name": "Wireless Mouse",
+      "description": "Ergonomic wireless mouse with adjustable DPI",
+      "price": 19.99,
+      "stock": 100,
+      "created_at": "2024-12-25T10:00:00Z"
+    }
+  }
+  ```
+
+---
+
+### **List All Products**
+- **Method**: `GET`
+- **Route**: `/api/v1/products`
+- **Description**: Retrieve a list of all available products.
+- **Access**: Authenticated users
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Products retrieved successfully",
+    "data": [
+      {
+        "id": "uuid-1234-5678-91011",
+        "name": "Wireless Mouse",
+        "description": "Ergonomic wireless mouse with adjustable DPI",
+        "price": 19.99,
+        "stock": 100
+      }
+    ]
+  }
+  ```
+
+---
+
+### **Get a Product by ID**
+- **Method**: `GET`
+- **Route**: `/api/v1/products/{id}`
+- **Description**: Retrieve details of a specific product by its ID.
+- **Access**: Authenticated users
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product retrieved successfully",
+    "data": {
+      "id": "uuid-1234-5678-91011",
+      "name": "Wireless Mouse",
+      "description": "Ergonomic wireless mouse with adjustable DPI",
+      "price": 19.99,
+      "stock": 100
+    }
+  }
+  ```
+
+---
+
+### **Update a Product**
+- **Method**: `PUT`
+- **Route**: `/api/v1/products/{id}`
+- **Description**: Update details of an existing product by its ID.
+- **Access**: Admin only
+
+#### **Request Payload**:
+```json
+{
+  "name": "Updated Wireless Mouse",
+  "description": "Updated ergonomic wireless mouse",
+  "price": 24.99,
+  "stock": 150
+}
+```
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product updated successfully",
+    "data": {
+      "id": "uuid-1234-5678-91011",
+      "name": "Updated Wireless Mouse",
+      "description": "Updated ergonomic wireless mouse",
+      "price": 24.99,
+      "stock": 150
+    }
+  }
+  ```
+
+---
+
+### **Delete a Product**
+- **Method**: `DELETE`
+- **Route**: `/api/v1/products/{id}`
+- **Description**: Delete a product by its ID.
+- **Access**: Admin only
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Product deleted successfully"
+  }
+  ```
+
+---
+
+## **Order Management**
+
+### **Place an Order**
+- **Method**: `POST`
+- **Route**: `/api/v1/orders`
+- **Description**: Place an order for one or more products.
+- **Access**: Authenticated users
+
+#### **Request Payload**:
+```json
+{
+  "items": [
+    {
+      "product_id": "uuid-1234-5678-91011",
+      "quantity": 2
+    }
+  ]
+}
+```
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Order placed successfully",
+    "data": {
+      "order_id": "uuid-1234-5678-91011",
+      "status": "Pending",
+      "items": [
+        {
+          "product_id": "uuid-1234-5678-91011",
+          "quantity": 2
+        }
+      ]
+    }
+  }
+  ```
+
+---
+
+### **List All Orders for a User**
+- **Method**: `GET`
+- **Route**: `/api/v1/orders`
+- **Description**: List all orders placed by the authenticated user.
+- **Access**: Authenticated users
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Orders retrieved successfully",
+    "data": [
+      {
+        "order_id": "uuid-1234-5678-91011",
+        "status": "Pending",
+        "items": [
+          {
+            "product_id": "uuid-1234-5678-91011",
+            "quantity": 2
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+---
+
+### **Cancel an Order**
+- **Method**: `PUT`
+- **Route**: `/api/v1/orders/{id}/cancel`
+- **Description**: Cancel an order if it is still in the "Pending" status.
+- **Access**: Authenticated users
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Order canceled successfully",
+    "data": {
+      "order_id": "uuid-1234-5678-91011",
+      "status": "Canceled"
+    }
+  }
+  ```
+
+---
+
+### **Update Order Status**
+- **Method**: `PUT`
+- **Route**: `/api/v1/orders/{id}/status`
+- **Description**: Update the status of an order.
+- **Access**: Admin only
+
+#### **Request Payload**:
+```json
+{
+  "status": "Shipped"
+}
+```
+
+#### **Response**:
+- **Success (200)**:
+  ```json
+  {
+    "message": "Order status updated successfully",
+    "data": {
+      "order_id": "uuid-1234-5678-91011",
+      "status": "Shipped"
+    }
+  }
+  ```
+
+--- 
+
+### **Notes**
+- Ensure proper error handling for invalid inputs and missing parameters.
+- All requests requiring authentication must include the `Authorization` header with the format:
+  ```json
+  {
+    "Authorization": "Bearer <JWT_TOKEN>"
+  }
+  ```
